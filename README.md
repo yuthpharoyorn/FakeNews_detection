@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 # 📰 Fake News Link Detector API
@@ -105,3 +106,6 @@ You can test the API directly without the frontend using the automatic documenta
 ## 📜 License
 
 This project is licensed under the MIT License.
+=======
+# Fake_News_Detection
+>>>>>>> 56e2c26de6def031dfa186dac6623c234b7eea28
