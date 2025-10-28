@@ -1,0 +1,119 @@
+:root {
+    --primary-color: #007bff;
+    --fake-color: #dc3545;
+    --real-color: #28a745;
+    --bg-color: #f8f9fa;
+    --text-color: #343a40;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 550px;
+    text-align: center;
+}
+
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+p {
+    color: var(--text-color);
+    margin-bottom: 25px;
+}
+
+.input-area {
+    display: flex;
+    margin-bottom: 30px;
+}
+
+#link-input {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px 0 0 6px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#link-input:focus {
+    border-color: var(--primary-color);
+}
+
+#analyze-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    cursor: pointer;
+    border-radius: 0 6px 6px 0;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#analyze-button:hover {
+    background-color: #0056b3;
+}
+
+/* Status/Result Box Styles */
+.status-box {
+    padding: 20px;
+    border-radius: 8px;
+    min-height: 50px; /* Ensures consistent height */
+    text-align: center;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Specific Result Styles */
+.fake-result {
+    background-color: #f8d7da; /* Light Red */
+    border: 2px solid var(--fake-color);
+    color: var(--fake-color);
+}
+
+.real-result {
+    background-color: #d4edda; /* Light Green */
+    border: 2px solid var(--real-color);
+    color: var(--real-color);
+}
+
+.error-result {
+    background-color: #fff3cd; /* Light Yellow */
+    border: 2px solid #ffc107;
+    color: #856404;
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
