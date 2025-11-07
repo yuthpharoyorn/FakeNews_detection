@@ -106,3 +106,10 @@ You can test the API directly without the frontend using the automatic documenta
 
 This project is licensed under the MIT License.
 # Fake_News_Detection
+
+
+
+### Dataset
+Download dataset from Kaggle:
+[Fake and Real News Dataset](https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset)
+Place `Fake.csv` and `True.csv` inside the `Dataset/` folder before running the code.
