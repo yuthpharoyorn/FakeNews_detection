@@ -6,6 +6,38 @@ __pycache__/
 #dataset
 *.csv
 
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+.venv/
+
+# VS Code
+.vscode/
+
+# Models & Data (These are too big for Git)
+*.h5
+*.keras
+*.pkl
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+.venv/
+
+# VS Code
+.vscode/
+
+# Models & Data (These are too big for Git)
+*.h5
+*.keras
+*.pkl
+*.csv
+
 # C extensions
 *.so
 

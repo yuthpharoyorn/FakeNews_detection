@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "FakeNews_Detection",
+			"path": ".."
+		},
+		{
+			"name": "news_dataset",
+			"path": "E:/news_dataset"
+		}
+	],
+	"settings": {}
+}

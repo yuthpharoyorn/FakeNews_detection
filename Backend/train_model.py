@@ -2,18 +2,43 @@
 import pandas as pd
 import os
 import nltk
-from nltk.corpus import stopwords
 import re
 import string
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.utils import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout, Bidirectional
+from sklearn.metrics import classification_report
+from tensorflow.keras.callbacks import EarlyStopping
+from nltk.corpus import stopwords
+import pickle
+from tensorflow.keras.models import load_model # Good to have, though not used here
+
+
+# --- CONFIGURATION ---
+# Define the maximum number of words to keep in the vocabulary
+MAX_WORDS = 10000 
+# Define the maximum length of a sequence/article (e.g., first 500 words)
+MAX_LEN = 500
+# Dimension for the word embeddings
+EMBEDDING_DIM = 100 
+# ---------------------
 
 def clean_text(text):
-    
+    """Performs basic text cleaning and removal of stop words."""
     text = str(text).lower()
-    text = re.sub(r'\[.*?\]', '', text)
-    text = re.sub(r'https?://\S+|www\.\S+', '', text)
-    text = re.sub(r'<.*?>+', '', text)
-    text = re.sub(r'[%s]' % re.escape(string.punctuation), '', text)
-    text = re.sub(r'\n', '', text)
+    text = re.sub(r'^[a-z\s]+\(reuters\)\s*-\s*', '', text)
+    text = re.sub(r'\[.*?\]', '', text)       # Remove text in square brackets
+    text = re.sub(r'https?://\S+|www\.\S+', '', text) # Remove URLs
+    text = re.sub(r'<.*?>+', '', text)       # Remove HTML tags
+    text = re.sub(r'[%s]' % re.escape(string.punctuation), '', text) # Remove punctuation
+    text = re.sub(r'\n', '', text)           # Remove newlines
+    
+    # Optional: Remove Stop Words
+    stop_words = set(stopwords.words('english'))
+    # text = ' '.join(word for word in text.split() if word not in stop_words)
+    
     return text
 
 def prepare_data():
@@ -25,27 +50,134 @@ def prepare_data():
 
     # 2. Load Data
     print("Loading data...")
-    df_fake = pd.read_csv(fake_path)
-    df_true = pd.read_csv(true_path)
-    
+    try:
+        df_fake = pd.read_csv(fake_path)
+        df_true = pd.read_csv(true_path)
+    except FileNotFoundError as e:
+        print(f"Error: Dataset file not found. Check path: {e.filename}")
+        return None, None
+
     # 3. Add Labels
-    df_fake['label'] = 0
-    df_true['label'] = 1
+    df_fake['label'] = 0  # Fake
+    df_true['label'] = 1  # Real
 
     # 4. Merge & Clean
     df = pd.concat([df_fake, df_true]).sample(frac=1).reset_index(drop=True)
     
-    print("Cleaning data... this might take a minute.")
-    # Download NLTK data only once
-    nltk.download('stopwords')
+    # Combine title and text for stronger feature extraction
+    df['content'] = df['title'] + ' ' + df['text']
     
-    df['text'] = df['text'].apply(clean_text)
+    print(f"Total dataset size: {len(df)}")
+    print("Cleaning data...")
     
-    print("Data cleaned!")
-    print(df.head())
+    # Ensure NLTK data is available
+    try:
+        nltk.data.find('corpora/stopwords')
+    except nltk.downloader.DownloadError:
+        nltk.download('stopwords')
     
-    # LATER: We will save the model here
-    # model.save("fake_news_model.pkl")
+    df['content'] = df['content'].apply(clean_text)
+    
+    print("Data cleaned! Ready for vectorization.")
+    return df
+
+# --- Add this import at the top of your file ---
+
+
+def train_and_evaluate_model(df):
+    
+    # --- 1. Split Data ---
+    X = df['content'].values
+    y = df['label'].values
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # --- 2. Tokenization and Sequencing (Word Embedding Prep) ---
+    print("Tokenizing text and padding sequences...")
+    
+    tokenizer = Tokenizer(num_words=MAX_WORDS, oov_token="<OOV>")
+    tokenizer.fit_on_texts(X_train)
+
+    # ... after this line
+    tokenizer.fit_on_texts(X_train) 
+    
+    # --- ADD THESE LINES ---
+    # Save the tokenizer so we can use it for new predictions
+    tokenizer_save_path = os.path.join(os.path.dirname(__file__), '..', 'models', 'tokenizer.pkl')
+    with open(tokenizer_save_path, 'wb') as f:
+        pickle.dump(tokenizer, f)
+    print(f"Tokenizer saved successfully to {tokenizer_save_path}")
+    # --- END ADDITION ---
+    
+    # Convert text to sequences of integers
+    train_sequences = tokenizer.texts_to_sequences(X_train)
+    # ... rest of the code
+    
+    train_sequences = tokenizer.texts_to_sequences(X_train)
+    test_sequences = tokenizer.texts_to_sequences(X_test)
+    
+    X_train_padded = pad_sequences(train_sequences, maxlen=MAX_LEN, padding='post', truncating='post')
+    X_test_padded = pad_sequences(test_sequences, maxlen=MAX_LEN, padding='post', truncating='post')
+    
+    # --- 3. Build Bidirectional LSTM Model ---
+    print("Building model...")
+    
+    model = Sequential([
+        Embedding(MAX_WORDS, EMBEDDING_DIM, input_length=MAX_LEN),
+        Bidirectional(LSTM(64, return_sequences=True)),
+        Bidirectional(LSTM(32)),
+        Dense(24, activation='relu'),
+        Dropout(0.5), 
+        Dense(1, activation='sigmoid')
+    ])
+    
+    model.compile(loss='binary_crossentropy',
+                  optimizer='adam',
+                  metrics=['accuracy'])
+    
+    print(model.summary())
+    
+    # --- 4. Train Model (WITH EARLY STOPPING) ---
+    print("Starting training...")
+    
+    # --- NEW CODE ---
+    # Stop training if 'val_loss' doesn't improve for 2 consecutive epochs.
+    # restore_best_weights=True ensures we keep the model from the best epoch.
+    early_stopping = EarlyStopping(monitor='val_loss', 
+                                    patience=2, 
+                                    restore_best_weights=True,
+                                    verbose=1)
+    
+    # Increase epochs since early stopping will find the best one
+    history = model.fit(X_train_padded, y_train, 
+                        epochs=10, # Increased from 5
+                        batch_size=32, 
+                        validation_split=0.1, 
+                        verbose=1,
+                        callbacks=[early_stopping]) # <-- Pass the callback here
+    
+    # --- 5. Evaluate Model ---
+    print("\nEvaluating model performance on test set (with best weights)...")
+    loss, accuracy = model.evaluate(X_test_padded, y_test, verbose=0)
+    print(f"Test Loss: {loss:.4f}")
+    print(f"Test Accuracy: {accuracy:.4f}")
+
+    # ... (rest of your evaluation and saving code is fine) ...
+    y_pred_probs = model.predict(X_test_padded)
+    y_pred = (y_pred_probs > 0.5).astype("int32")
+    
+    print("\nClassification Report:")
+    print(classification_report(y_test, y_pred))
+    
+   # NEW (just changed the extension)
+    model_save_path = os.path.join(os.path.join(os.path.dirname(__file__), '..', 'models', 'fake_news_model.keras'))
+    model.save(model_save_path)
+    print(f"\nModel saved successfully to {model_save_path}")
 
 if __name__ == "__main__":
-    prepare_data()
+
+    df = prepare_data()
+
+    if df is not None:
+
+        train_and_evaluate_model(df)

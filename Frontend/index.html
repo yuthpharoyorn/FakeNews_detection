@@ -3,31 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake News Detector - Frontend Mockup</title>
+    <title>Fake News Detector</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    
+    <header class="site-header">
+        <h1>📰 Fake News Detector</h1>
+        <p>Paste the full article text below to check its credibility.</p>
+    </header>
+
     <div class="container">
-        <h1>🔗 Link Authenticator</h1>
-        <p>Paste the article URL below to check its credibility.</p>
 
         <div class="input-area">
-            <input type="url" id="link-input" placeholder="Paste link here, e.g., https://news.example.com" required>
+            <textarea id="article-text" placeholder="Paste the full article text here..."></textarea>
             <button id="analyze-button">Analyze</button>
         </div>
 
         <div id="status-container" class="status-box hidden">
             <div id="loading-indicator" class="hidden">
                 <div class="spinner"></div>
-                <p>Analyzing link...</p>
+                <p>Analyzing text...</p>
             </div>
             
             <div id="result-display">
                 </div>
         </div>
 
-    </div>
-
-    <script src="script.js"></script>
+    </div> <script src="script.js"></script>
 </body>
 </html>

@@ -1,82 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
 :root {
     --primary-color: #007bff;
+    --primary-color-dark: #0056b3;
     --fake-color: #dc3545;
     --real-color: #28a745;
+    --error-color: #ffc107;
     --bg-color: #f8f9fa;
     --text-color: #343a40;
+    --text-color-light: #6c757d;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background-color: var(--bg-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    /* Changed display to block, as content is now stacked */
     min-height: 100vh;
     margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.container {
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 550px;
+/* --- NEW HEADER STYLES --- */
+.site-header {
     text-align: center;
+    padding: 20px;
+    max-width: 550px;
+    margin: 0 auto; /* Center the header */
 }
 
-h1 {
-    color: var(--primary-color);
+.site-header h1 {
+    color: var(--text-color);
+    font-weight: 700;
     margin-bottom: 5px;
 }
 
-p {
-    color: var(--text-color);
-    margin-bottom: 25px;
+.site-header p {
+    color: var(--text-color-light);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+/* --- END HEADER STYLES --- */
+
+
+.container {
+    background: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    border: 1px solid #e0e6ed;
+    /* This is the box-shadow you requested */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.07);
+    width: 100%;
+    max-width: 550px;
+    margin: 0 auto; /* Center the container */
 }
 
 .input-area {
-    display: flex;
+    display: block;
     margin-bottom: 30px;
+    width: 100%;
 }
 
-#link-input {
-    flex-grow: 1;
+#article-text {
+    width: 100%;
+    height: 180px;
     padding: 12px;
     border: 1px solid #ced4da;
-    border-radius: 6px 0 0 6px;
+    border-radius: 8px;
     font-size: 16px;
+    font-family: inherit;
     outline: none;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    resize: vertical;
+    box-sizing: border-box;
 }
 
-#link-input:focus {
+#article-text:focus {
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
 }
 
+/* --- MORE APPEALING BUTTON --- */
 #analyze-button {
     background-color: var(--primary-color);
+    /* Gradient for a modern feel */
+    background-image: linear-gradient(45deg, var(--primary-color), var(--primary-color-dark));
     color: white;
     border: none;
-    padding: 12px 25px;
+    padding: 14px 25px;
     cursor: pointer;
-    border-radius: 0 6px 6px 0;
+    border-radius: 8px;
     font-size: 16px;
-    transition: background-color 0.3s;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 15px;
+    /* Softer, more modern shadow */
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
 }
 
 #analyze-button:hover {
-    background-color: #0056b3;
+    background-image: linear-gradient(45deg, var(--primary-color-dark), var(--primary-color));
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+    /* Subtle "lift" on hover */
+    transform: translateY(-2px);
 }
 
-/* Status/Result Box Styles */
+#analyze-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+/* --- MODERN RESULT/STATUS BOXES --- */
 .status-box {
     padding: 20px;
     border-radius: 8px;
-    min-height: 50px; /* Ensures consistent height */
-    text-align: center;
-    font-weight: bold;
+    min-height: 50px;
+    text-align: left; /* Changed for alert style */
+    font-weight: 600;
+    line-height: 1.6;
+    border-left: 5px solid #ccc; /* Default border */
 }
 
 .hidden {
@@ -85,24 +130,41 @@ p {
 
 /* Specific Result Styles */
 .fake-result {
-    background-color: #f8d7da; /* Light Red */
-    border: 2px solid var(--fake-color);
-    color: var(--fake-color);
+    background-color: #f8d7da;
+    border-left-color: var(--fake-color);
+    color: #721c24;
 }
 
 .real-result {
-    background-color: #d4edda; /* Light Green */
-    border: 2px solid var(--real-color);
-    color: var(--real-color);
+    background-color: #d4edda;
+    border-left-color: var(--real-color);
+    color: #155724;
 }
 
 .error-result {
-    background-color: #fff3cd; /* Light Yellow */
-    border: 2px solid #ffc107;
+    background-color: #fff3cd;
+    border-left-color: var(--error-color);
     color: #856404;
 }
 
+#result-display strong {
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 4px;
+}
+
 /* Loading Spinner */
+#loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color-light);
+}
+
+#loading-indicator p {
+    margin: 0 0 0 12px;
+}
+
 .spinner {
     border: 4px solid rgba(0, 0, 0, 0.1);
     border-top: 4px solid var(--primary-color);
@@ -110,7 +172,7 @@ p {
     width: 24px;
     height: 24px;
     animation: spin 1s linear infinite;
-    margin: 0 auto 10px;
+    margin: 0;
 }
 
 @keyframes spin {

@@ -1,85 +1,82 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const linkInput = document.getElementById('link-input');
+    // 1. Get the new textarea element
+    const articleInput = document.getElementById('article-text'); // Changed from 'link-input'
     const analyzeButton = document.getElementById('analyze-button');
     const statusContainer = document.getElementById('status-container');
     const loadingIndicator = document.getElementById('loading-indicator');
     const resultDisplay = document.getElementById('result-display');
 
     analyzeButton.addEventListener('click', async () => {
-        const link = linkInput.value.trim();
+        // 2. Get the text from the textarea
+        const articleText = articleInput.value.trim();
 
-     // 1. Basic Validation
-        
-        if (!link) {
-         alert('Please enter a link to analyze.');
+        // 3. Basic Validation
+        if (!articleText) {
+            alert('Please paste an article to analyze.');
             return;
-}
+        }
 
-// 2. we r using NLP to make input validation
-// This pattern checks for: (protocol OR www.) AND (domain structure)
-        const urlPattern = /^(https?:\/\/.+|www\..+\..+)/i;
-
-        if (!urlPattern.test(link)) {
-            alert('⚠️ Invalid link format. Please ensure you have copied the full URL, including "https://" or "www.".');
-            return;
-}
-
-        // 2. Set UI to Loading State
+        // 4. Set UI to Loading State (Your code is perfect)
         resetStatusClasses();
         statusContainer.classList.remove('hidden');
         loadingIndicator.classList.remove('hidden');
-        resultDisplay.innerHTML = ''; // Clear previous result text
+        resultDisplay.innerHTML = '';
 
-        // 3. Simulate interacting with backend, we will update this section once we setup our backend endpoint
+        // 5. --- THIS IS THE NEW PART: Call your real backend API ---
         try {
-            // --- This block simulates the API call and result ---
-           
-            await new Promise(resolve => setTimeout(resolve, 3000)); 
+            const response = await fetch('http://127.0.0.1:8000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: articleText // Send the text in the format the API expects
+                }),
+            });
 
-            // Simulate 3 possible results (Fake, Real, or API Error)
-            const randomChance = Math.random();
-            let resultType;
-
-            if (randomChance < 0.45) {
-                resultType = 'fake'; 
-            } else if (randomChance < 0.9) {
-                resultType = 'real'; 
-            } else {
-                
-                resultType = 'error';
+            if (!response.ok) {
+                // Handle HTTP errors (e.g., 500 server error)
+                throw new Error(`API error: ${response.statusText}`);
             }
-           
 
-            // 4. Update UI based on Simulated Result
-            updateResultDisplay(resultType);
+            const data = await response.json();
+
+            // 6. Update UI based on the *real* API result
+            updateResultDisplay(data);
 
         } catch (error) {
             console.error('Analysis failed:', error);
-            updateResultDisplay('error');
+            // Call your existing error function, but with a more specific message
+            updateResultDisplay({ label: 'error', message: 'Could not connect to the API server.' });
         } finally {
-            // 5. Hide Loading State
+            // 7. Hide Loading State (Your code is perfect)
             loadingIndicator.classList.add('hidden');
         }
     });
 
-    /**reset the status */
+    /** Resets the status container classes */
     function resetStatusClasses() {
         statusContainer.classList.remove('fake-result', 'real-result', 'error-result');
     }
 
-    /** Updates the UI with the final result */
-    function updateResultDisplay(type) {
+    /** * Updates the UI with the final result.
+     * This is now driven by the API response object 'data'.
+     */
+    function updateResultDisplay(data) {
         resetStatusClasses();
         
-        if (type === 'fake') {
+        if (data.label === 'Fake News') {
             statusContainer.classList.add('fake-result');
-            resultDisplay.innerHTML = '🚨 **RESULT: FAKE NEWS** 🚨 <br> This source appears highly questionable.';
-        } else if (type === 'real') {
+            const prob = (1 - data.probability_real) * 100;
+            resultDisplay.innerHTML = `🚨 **RESULT: FAKE NEWS** 🚨 <br> (${prob.toFixed(1)}% Fake)`;
+        } else if (data.label === 'Real News') {
             statusContainer.classList.add('real-result');
-            resultDisplay.innerHTML = '✅ **RESULT: GENUINE** ✅ <br> This source appears credible.';
+            const prob = data.probability_real * 100;
+            resultDisplay.innerHTML = `✅ **RESULT: GENUINE** ✅ <br> (${prob.toFixed(1)}% Real)`;
         } else {
+            // This handles the 'error' case
             statusContainer.classList.add('error-result');
-            resultDisplay.innerHTML = '⚠️ **ANALYSIS FAILED** ⚠️ <br> Could not reach the detector. Check the link and try again.';
+            resultDisplay.innerHTML = `⚠️ **ANALYSIS FAILED** ⚠️ <br> ${data.message || 'An unknown error occurred.'}`;
         }
     }
 });
