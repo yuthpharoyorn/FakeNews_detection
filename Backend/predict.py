@@ -3,8 +3,8 @@ import re
 import string
 import pickle
 import os
-from tensorflow.keras.models import load_model
-from tensorflow.keras.utils import pad_sequences
+from tensorflow.keras.models import load_model # type: ignore
+from tensorflow.keras.utils import pad_sequences # type: ignore
 from nltk.corpus import stopwords
 
 # --- CONFIGURATION (Must be the same as training) ---

@@ -5,8 +5,8 @@ import os
 import pickle
 import re
 import string
-from tensorflow.keras.models import load_model
-from tensorflow.keras.utils import pad_sequences
+from tensorflow.keras.models import load_model # type: ignore
+from tensorflow.keras.utils import pad_sequences # type: ignore
 # Note: You might need to run `nltk.download('stopwords')` once from your terminal
 # if you get an error here.
 from nltk.corpus import stopwords

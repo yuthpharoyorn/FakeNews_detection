@@ -5,15 +5,15 @@ import nltk
 import re
 import string
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.utils import pad_sequences
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout, Bidirectional
+from tensorflow.keras.preprocessing.text import Tokenizer # type: ignore
+from tensorflow.keras.utils import pad_sequences # type: ignore
+from tensorflow.keras.models import Sequential # type: ignore
+from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout, Bidirectional # type: ignore
 from sklearn.metrics import classification_report
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping # type: ignore
 from nltk.corpus import stopwords
 import pickle
-from tensorflow.keras.models import load_model # Good to have, though not used here
+from tensorflow.keras.models import load_model # type: ignore # Good to have, though not used here
 
 
 # --- CONFIGURATION ---

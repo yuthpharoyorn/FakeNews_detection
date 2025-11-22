@@ -4,10 +4,7 @@
 			"name": "FakeNews_Detection",
 			"path": ".."
 		},
-		{
-			"name": "news_dataset",
-			"path": "E:/news_dataset"
-		}
+		// Removed machine-specific news_dataset folder for portability
 	],
 	"settings": {}
 }
